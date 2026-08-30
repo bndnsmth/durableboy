@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A server-authoritative Game Boy living inside a Cloudflare Durable Object."
+    />
+    <meta name="theme-color" content="#0b1115" />
+    <link rel="icon" href="/durableboy-icon.png" />
+    <link rel="apple-touch-icon" href="/durableboy-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>DurableBoy / Edge Console</title>
+  </head>
+  <body>
+    <main class="workbench">
+      <header class="masthead">
+        <a class="wordmark" href="/" aria-label="DurableBoy home">
+          <span class="wordmark__mark">DB</span>
+          <span>DurableBoy</span>
+        </a>
+        <div class="network-state" aria-live="polite">
+          <span class="network-state__lamp" id="network-lamp"></span>
+          <span id="network-label">OFFLINE</span>
+        </div>
+      </header>
+
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">EDGE HARDWARE LAB / UNIT 001</p>
+        <h1 id="page-title">The console is<br />the server.</h1>
+        <p class="intro__copy">
+          This screen is only glass and buttons. The CPU, memory, cartridge, and clock exist inside
+          one persistent Cloudflare Durable Object.
+        </p>
+      </section>
+
+      <section class="console-bay" aria-label="DurableBoy console">
+        <div class="console-shell" id="console-shell">
+          <div class="console-shell__topline">
+            <span>DURABLE OBJECT</span>
+            <span id="model-stamp">NO MODEL</span>
+          </div>
+
+          <div class="screen-bezel">
+            <div class="screen-bezel__legend">
+              <span>DOT MATRIX WITH STEREO SOUND</span>
+              <span class="power-led"><i></i> POWER</span>
+            </div>
+            <div class="screen-wrap">
+              <canvas
+                id="game-screen"
+                width="160"
+                height="144"
+                aria-label="Remote Game Boy framebuffer"
+              ></canvas>
+              <div class="screen-empty" id="screen-empty">
+                <strong>NO CARTRIDGE</strong>
+                <span>SELECT A ROM TO COMMISSION HARDWARE</span>
+              </div>
+              <div class="scanlines" aria-hidden="true"></div>
+            </div>
+          </div>
+
+          <div class="hardware-controls">
+            <div class="dpad" aria-label="Directional pad">
+              <button data-button="up" aria-label="Up">▲</button>
+              <button data-button="left" aria-label="Left">◀</button>
+              <span></span>
+              <button data-button="right" aria-label="Right">▶</button>
+              <button data-button="down" aria-label="Down">▼</button>
+            </div>
+
+            <div class="system-buttons">
+              <button data-button="select"><span></span>SELECT</button>
+              <button data-button="start"><span></span>START</button>
+            </div>
+
+            <div class="action-buttons" aria-label="Action buttons">
+              <button data-button="b" aria-label="B button">B</button>
+              <button data-button="a" aria-label="A button">A</button>
+            </div>
+          </div>
+        </div>
+
+        <aside class="operations" aria-label="Console operations">
+          <div class="operations__heading">
+            <span>OPS / CONTROL</span>
+            <span id="role-label">UNASSIGNED</span>
+          </div>
+
+          <div class="setup-panel" id="setup-panel">
+            <p class="step-label">01 / SELECT CARTRIDGE</p>
+            <form id="create-form">
+              <label class="rom-drop" for="create-rom-input">
+                <input
+                  id="create-rom-input"
+                  type="file"
+                  accept=".gb,.gbc,application/octet-stream"
+                  required
+                />
+                <span class="rom-drop__icon">↳</span>
+                <strong>CHOOSE USER-SUPPLIED ROM</strong>
+                <small>DMG / CGB DETECTED FROM HEADER · 8 MiB MAX</small>
+              </label>
+              <button class="primary-action" type="submit">CREATE &amp; INSERT</button>
+            </form>
+          </div>
+
+          <div class="recent-panel" id="recent-panel" hidden>
+            <p class="step-label">RECENT / LOCAL TO THIS BROWSER</p>
+            <ul id="recent-consoles"></ul>
+          </div>
+
+          <div class="cartridge-panel" id="cartridge-panel" hidden>
+            <p class="step-label">02 / INSERT CARTRIDGE</p>
+            <label class="rom-drop" for="rom-input">
+              <input id="rom-input" type="file" accept=".gb,.gbc,application/octet-stream" />
+              <span class="rom-drop__icon">↳</span>
+              <strong>CHOOSE USER-SUPPLIED ROM</strong>
+              <small>Game Boy / Game Boy Color · 8 MiB MAX</small>
+            </label>
+          </div>
+
+          <div class="run-panel" id="run-panel" hidden>
+            <div class="cartridge-label">
+              <span>LOADED MEDIA</span>
+              <strong id="cartridge-title">UNTITLED</strong>
+              <small id="cartridge-hash">SHA256 / —</small>
+            </div>
+            <div class="run-actions">
+              <button class="primary-action" id="power-button" type="button">RUN</button>
+              <button class="text-action" id="checkpoint-button" type="button">CHECKPOINT</button>
+            </div>
+          </div>
+
+          <div class="console-actions" id="console-actions" hidden>
+            <button class="text-action" id="share-button" type="button">COPY SHARE LINK</button>
+            <button class="text-action" id="fullscreen-button" type="button">FULLSCREEN</button>
+            <button class="text-action" id="new-console-button" type="button">NEW CONSOLE</button>
+            <div class="owner-actions" id="owner-actions" hidden>
+              <button class="text-action" id="eject-button" data-owner-action type="button">
+                EJECT
+              </button>
+              <button
+                class="text-action danger-action"
+                id="delete-button"
+                data-owner-action
+                type="button"
+              >
+                DELETE CONSOLE
+              </button>
+            </div>
+          </div>
+
+          <details class="control-help">
+            <summary>KEYBOARD / GAMEPAD MAP</summary>
+            <p>ARROWS D-PAD · Z B · X A · BACKSPACE SELECT · ENTER START</p>
+            <p>STANDARD GAMEPADS ARE DETECTED AUTOMATICALLY.</p>
+          </details>
+
+          <dl class="instrumentation">
+            <div>
+              <dt>CONSOLE</dt>
+              <dd id="console-id">—</dd>
+            </div>
+            <div>
+              <dt>LIFECYCLE</dt>
+              <dd id="lifecycle">EMPTY</dd>
+            </div>
+            <div>
+              <dt>FRAME</dt>
+              <dd id="frame-count">0</dd>
+            </div>
+            <div>
+              <dt>VIRTUAL TIME</dt>
+              <dd id="virtual-time">0.00 s</dd>
+            </div>
+            <div>
+              <dt>WASM MEMORY</dt>
+              <dd id="memory-use">0.0 MiB</dd>
+            </div>
+            <div>
+              <dt>STATE IMAGE</dt>
+              <dd id="state-size">0 KiB</dd>
+            </div>
+          </dl>
+
+          <p class="operation-message" id="operation-message" aria-live="polite"></p>
+        </aside>
+      </section>
+
+      <footer class="footer-note">
+        <span>AUTHORITY / CLOUDFLARE EDGE</span>
+        <span>VIDEO / RAW FRAMEBUFFER</span>
+        <span>MEDIA / NEVER BUNDLED</span>
+      </footer>
+    </main>
+
+    <script type="module" src="/src/client/main.ts"></script>
+  </body>
+</html>

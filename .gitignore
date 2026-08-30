@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.wrangler/
+.dev.vars
+coverage/
+.tmp/
+vendor/SameBoy/
+src/emulator/sameboy.wasm
+wasm/generated/
+worker-configuration.d.ts
+*.log

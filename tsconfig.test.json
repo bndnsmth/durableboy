@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2024", "DOM"],
+    "types": ["node", "vitest/globals", "@cloudflare/vitest-plugin/types"]
+  },
+  "include": [
+    "test/**/*.ts",
+    "src/shared/**/*.ts",
+    "types/wasm.d.ts",
+    "worker-configuration.d.ts",
+    "vite.config.ts",
+    "vitest.config.ts"
+  ]
+}

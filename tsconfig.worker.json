@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2024"],
+    "types": []
+  },
+  "include": ["src/**/*.ts", "types/wasm.d.ts", "worker-configuration.d.ts"],
+  "exclude": ["src/client/**/*.ts"]
+}

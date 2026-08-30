@@ -1,0 +1,44 @@
+{
+  "name": "durableboy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vp build",
+    "cf-typegen": "wrangler types",
+    "check": "vp run cf-typegen && vp check && tsc --noEmit -p tsconfig.worker.json && tsc --noEmit -p tsconfig.client.json && tsc --noEmit -p tsconfig.test.json",
+    "deploy": "vp run build && wrangler deploy",
+    "dev": "vp run build && wrangler dev --live-reload",
+    "dev:client": "vp dev",
+    "format": "vp fmt",
+    "lint": "vp lint",
+    "smoke": "vp run smoke:rom && node scripts/smoke-wasm.mjs src/emulator/sameboy.wasm .tmp/smoke.gb",
+    "smoke:rom": "bash scripts/build-smoke-rom.sh",
+    "test": "vp test run",
+    "test:watch": "vp test",
+    "wasm:build": "bash scripts/build-wasm.sh",
+    "wasm:download": "bash scripts/download-wasm.sh",
+    "wasm:inspect": "node scripts/inspect-wasm.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-plugin": "1.1.2",
+    "@types/node": "24.3.0",
+    "typescript": "7.0.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.5",
+    "vite-plus": "0.2.5",
+    "vitest": "4.1.10",
+    "wrangler": "4.127.1"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.5",
+    "vitest": "4.1.10"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "npm",
+      "version": "12.0.2",
+      "onFail": "download"
+    }
+  },
+  "packageManager": "npm@12.0.2"
+}
